@@ -10,11 +10,12 @@ def parse_input(input_lines):
 def get_number_of_wins(time, distance):
     speed = 0
     count = 0
-    while speed <= time:
-        new_distance = (time - speed) * speed
-        if new_distance > distance:
-            count += 1
-        speed += 1
+    speed = time // 2
+    while speed * (time - speed) > distance:
+        count += 1
+        speed -= 1
+    count *= 2
+    if time % 2 == 0: count -= 1 
     return count
 
 def part_1(times, distances):
