@@ -54,21 +54,30 @@ def get_location_mins(interval, map_index, maps):
         possible_range = range(row[1], row[1] + row[2])
         found = True
         if low in possible_range:
+            # if we find a mapping for the lower bound
             mapped_low = row[0] + (low - row[1])
-            if interval[-1] in possible_range: high = interval[-1] + 1
-            else: high = possible_range[-1] + 1
+            if interval[-1] in possible_range: high = interval[-1] + 1 # mapping for higher bound: all is good
+            else: high = possible_range[-1] + 1 # no mapping for higher bound: make upper bound of mapping new upper bound
             row_i += 1
             mapped_high = row[0] + (high - row[1])
             low = high
         elif low < possible_range.start:
+            # if lower bound is lower than start of the current mapping it means lower bound is not in this map
             mapped_low = low
-            if interval[-1] in possible_range: high = possible_range.start
-            else: high = interval[-1] + 1
-            mapped_high = row[0] + (high - row[1])
+            if interval[-1] in possible_range:
+                # if upper bound is in this map: make start of current mapping the new upper nound
+                high = possible_range.start
+                mapped_high = row[0] + (high - row[1])
+            else:
+                # else all is good
+                high = interval[-1] + 1
+                mapped_high = high
             low = high
         else:
+            # if lower bound is higher than current mapping upper bound
+            # we dont know if we made find it in the future so we just go to the next row
             row_i += 1
-            found = False
+            found = False # this boolean indicates we are not making a mapping in this iteration
         if found:
             if map_index == len(maps) - 1:
                 location_mins.append(mapped_low)
@@ -93,6 +102,7 @@ def part_2(seed_ranges, maps):
     for interval in seed_ranges:
         location_mins.extend(get_location_mins(interval, 0, maps))
     location_mins.sort()
+    print(location_mins)
     for location in location_mins:
         key = location
         for map in maps[::-1]:
