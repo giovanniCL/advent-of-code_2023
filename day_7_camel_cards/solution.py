@@ -1,5 +1,6 @@
 from functools import cmp_to_key
 from scoring_functions import scoring_functions, score_5_hand
+from utils import use_memo
 
 def parse_input(input_lines):
     hands = []
@@ -8,31 +9,26 @@ def parse_input(input_lines):
         hands.append((hand, int(bid)))
     return hands
 
-def score_hand(hand, memo):
-    score = memo.get(hand)
-    if not score:
-        score = score_5_hand(hand)
-        memo[hand] = score
-    return score
+@use_memo
+def score_hand(hand):
+    return score_5_hand(hand)
 
-def score_hand_with_jokers(hand, memo):
-    score = memo.get(hand)
-    if not score:
-        j_num = hand.count("J")
-        hand_without_j = "".join([character for character in hand if character != "J"])
-        score = scoring_functions[j_num](hand_without_j)
-        memo[hand] = score
+@use_memo
+def score_hand_with_jokers(hand):
+    j_num = hand.count("J")
+    hand_without_j = "".join([character for character in hand if character != "J"])
+    score = scoring_functions[j_num](hand_without_j)
     return score
 
 def solve_ties(hand_1, hand_2, tie_map):
     for char_1, char_2 in zip(hand_1, hand_2):
         if char_1 == char_2: continue
         if tie_map[char_1] > tie_map[char_2]: return 1
-        return -1
+        return -1    
     
-def compare(hand_1, hand_2, scoring_function, tie_map, memo):
-    hand_1_score = scoring_function(hand_1, memo)
-    hand_2_score = scoring_function(hand_2, memo)
+def compare(hand_1, hand_2, scoring_function, tie_map):
+    hand_1_score = scoring_function(hand_1)
+    hand_2_score = scoring_function(hand_2)
     if hand_1_score > hand_2_score: return 1
     elif hand_1_score < hand_2_score: return -1
     else: return solve_ties(hand_1, hand_2, tie_map)
@@ -44,15 +40,13 @@ def get_product_of_scores(hands):
     return total
 
 def part_1(hands):
-    memo = {}
     tie_map = {character: score for score, character in enumerate("23456789TJQKA")}
-    hands.sort(key=cmp_to_key(lambda x, y: compare(x[0], y[0], score_hand, tie_map, memo)))
+    hands.sort(key=cmp_to_key(lambda x, y: compare(x[0], y[0], score_hand, tie_map)))
     return get_product_of_scores(hands)
 
 def part_2(hands):
-    memo = {}
     tie_map = {character: score for score, character in enumerate("J23456789TQKA")}
-    hands.sort(key=cmp_to_key(lambda x, y: compare(x[0], y[0], score_hand_with_jokers, tie_map, memo)))
+    hands.sort(key=cmp_to_key(lambda x, y: compare(x[0], y[0], score_hand_with_jokers, tie_map)))
     return get_product_of_scores(hands)
 
 def main():
