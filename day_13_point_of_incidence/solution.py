@@ -17,7 +17,7 @@ def insert_into_map(key, value, map):
         map[key].add(value)
     else: map[key] = set([value])
 
-def get_mirror_front_candiates(map):
+def get_mirror_front_candidates(map):
     candidates = []
     for value in map.values():
         if len(value) > 1:
@@ -57,7 +57,7 @@ def check_for_mirrors(pattern):
     row_map = {}
     for i, row in enumerate(pattern):
         insert_into_map(row, i, row_map)
-    mirror_front_candidates = get_mirror_front_candiates(row_map)
+    mirror_front_candidates = get_mirror_front_candidates(row_map)
     found = True
     current_mirror_index = -1
     for value in mirror_front_candidates:
@@ -79,7 +79,7 @@ def check_for_smudged_mirrors(pattern):
     for i, row in enumerate(pattern):
         insert_into_map(row, i, row_map)
     row_map = aggregate_map_keys(row_map)
-    mirror_front_candidates = get_mirror_front_candiates(row_map)
+    mirror_front_candidates = get_mirror_front_candidates(row_map)
     found = True
     current_mirror_index = -1
     for value in mirror_front_candidates:
